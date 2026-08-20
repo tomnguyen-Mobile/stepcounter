@@ -1,5 +1,6 @@
 package com.mdi2.stepcounter
 
+import android.R.attr.onClick
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +48,9 @@ fun WearFitnessApp(
     val context = LocalContext.current
 
     var steps by remember { mutableIntStateOf(0)}
-    var stepsGoal by remember { mutableIntStateOf(10000) }
-    var calories by remember { mutableIntStateOf(0) }
-    var caloriesGoal by remember { mutableIntStateOf(500) }
+    var stepsGoal by remember { mutableIntStateOf(100) }
+    var calories by remember { mutableDoubleStateOf(0.0) }
+    var caloriesGoal by remember { mutableIntStateOf(5) }
     var manualHeartRate by remember { mutableIntStateOf(72) }
 
     val  displayedHeartRate = if (hasHeartRateSensor) { // conditionally assigned
@@ -103,6 +105,27 @@ fun WearFitnessApp(
             heartRateNotificationSent = false
         }
     }
+    LaunchedEffect(
+        steps,
+        notificationPermissionGranted
+    ){
+        if (
+            steps >= stepsGoal &&
+            !heartRateNotificationSent &&
+            notificationPermissionGranted
+        ){
+            showNotification(
+                context = context,
+                notificationId = STEP_COUNT_NOTIFICATION_ID,
+                title = "Step Count Achieved!",
+                message = "You reached your $stepsGoal steps!"
+            )
+            heartRateNotificationSent = true
+        }
+        if (steps < stepsGoal){
+            heartRateNotificationSent = false
+        }
+    }
 
     SwipeNavigationController(
         navController = navController
@@ -119,7 +142,7 @@ fun WearFitnessApp(
                     caloriesGoal = caloriesGoal,
                     onAddStep = {
                         steps++
-                        calories++
+                        calories += 0.05
                     }
                 )
             }
@@ -135,10 +158,10 @@ fun WearFitnessApp(
                 ModifyGoalScreen(
                     stepsGoal = stepsGoal,
                     caloriesGoal = caloriesGoal,
-                    onDecreaseStepsGoal = { stepsGoal -= 500 },
-                    onIncreaseStepsGoal = { stepsGoal += 500 },
-                    onDecreaseCaloriesGoal = { caloriesGoal -= 50 },
-                    onIncreaseCaloriesGoal = { caloriesGoal += 50 },
+                    onDecreaseStepsGoal = { stepsGoal -= 100 },
+                    onIncreaseStepsGoal = { stepsGoal += 100 },
+                    onDecreaseCaloriesGoal = { caloriesGoal -= 5 },
+                    onIncreaseCaloriesGoal = { caloriesGoal += 5 },
                 )
             }
         }
@@ -158,22 +181,22 @@ fun SwipeNavigationController(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .pointerInput(currentRoute){
+            .pointerInput(currentRoute) {
                 var totalDrag = 0f
                 detectHorizontalDragGestures(
-                    onDragStart = {totalDrag = 0f},
+                    onDragStart = { totalDrag = 0f },
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume()
                         totalDrag += dragAmount
                     },
                     onDragEnd = {
-                        if (totalDrag < -60 && currentIndex < routes.lastIndex){
-                            navController.navigate( routes[currentIndex+1] ){
+                        if (totalDrag < -60 && currentIndex < routes.lastIndex) {
+                            navController.navigate(routes[currentIndex + 1]) {
                                 launchSingleTop = true
                             }
                         }
-                        if (totalDrag > 60 && currentIndex > 0){
-                            navController.navigate( routes[currentIndex-1] ){
+                        if (totalDrag > 60 && currentIndex > 0) {
+                            navController.navigate(routes[currentIndex - 1]) {
                                 launchSingleTop = true
                             }
                         }
@@ -190,7 +213,7 @@ fun SwipeNavigationController(
 fun DailyProgressScreen(
     steps: Int,
     stepsGoal: Int,
-    calories: Int,
+    calories: Double,
     caloriesGoal: Int,
     onAddStep: () -> Unit,
 ){
@@ -218,7 +241,7 @@ fun DailyProgressScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "$calories / $caloriesGoal",
+            text = "${"%.2f".format(calories)} / $caloriesGoal",
             color = Color.White,
             style = MaterialTheme.typography.labelMedium
         )
@@ -365,62 +388,4 @@ fun ModifyGoalScreen(
     }
 }
 
-
-@Composable
-fun StepCounterScreen(){
-    var steps by remember { mutableIntStateOf(0)}
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){ // end of column arguments body
-        Text(
-            text = "Daily Goal",
-            color = Color.White,
-            style = MaterialTheme.typography.labelMedium
-        )
-        Text(
-            text = "10,000 steps / 500 cal",
-            color = Color.White,
-            style = MaterialTheme.typography.bodySmall
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Calories",
-            color = Color.White,
-            style = MaterialTheme.typography.labelMedium
-        )
-        Text(
-            text = "25 kcal",
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Steps Today",
-            color = Color.White,
-            style = MaterialTheme.typography.labelMedium
-        )
-        Text(
-            text = steps.toString(),
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(modifier = Modifier.height(14.dp))
-        Button(
-            onClick={ steps++ },
-            colors = androidx.wear.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black
-            ),
-        ) {
-            Text("Add Step")
-        }
-    } // end of column
-}
 

@@ -24,6 +24,7 @@ class HeartRateSensorManager(
         } else {
             Manifest.permission.BODY_SENSORS
         }
+    private var lastUpdateTime = 0L
 
     fun hasPermission(): Boolean {
         return ContextCompat.checkSelfPermission(context,requiredPermission) == PackageManager.PERMISSION_GRANTED
@@ -35,6 +36,7 @@ class HeartRateSensorManager(
         }
         heartRateSensor?.let {
             sensor -> sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+//            sensor -> sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
         }
     }
 
@@ -44,11 +46,17 @@ class HeartRateSensorManager(
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_HEART_RATE){
-            onHeartRateChanged(event.values[0].toInt())
+            val now = System.currentTimeMillis()
+
+            if (now - lastUpdateTime > 500) { // update every 500 ms
+                lastUpdateTime = now
+                onHeartRateChanged(event.values[0].toInt())
+
+            }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        // ignore
     }
 }

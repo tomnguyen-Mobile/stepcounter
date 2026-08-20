@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 
 const val CHANNEL_ID = "fitness_alerts"
 const val HEART_RATE_NOTIFICATION_ID = 1
+const val STEP_COUNT_NOTIFICATION_ID = 2
 
 @RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
 fun showNotification(
