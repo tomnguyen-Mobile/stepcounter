@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "867770591606",
+    "project_id": "wearfitness-50497",
+    "storage_bucket": "wearfitness-50497.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867770591606:android:1c24d6f26ca2bbf91a7257",
+        "android_client_info": {
+          "package_name": "edu.sdgku.stepcounter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDchiXZV2ut82dfqoCS-J0O2e26Ts5omUE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

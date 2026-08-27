@@ -22,6 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "stepcounter"
-include(":app")
- 
+rootProject.name = "WearFitness"
+include(":wear")
+include(":mobile")
+include(":shared")
