@@ -1,6 +1,7 @@
 package edu.sdgku.stepcounter
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +28,8 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import com.google.android.gms.wearable.Wearable
 import edu.sdgku.stepcounter.Theme.StepCounterTheme
+import edu.sdgku.stepcounter.shared.data.FirebaseRepository
+
 
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +44,23 @@ class MainActivity : ComponentActivity() {
         }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val repository = FirebaseRepository()
+        repository.listenToFitnessData(
+            onDataChange = { fitnessData ->
+                Log.d(
+                    "SharedFirebase",
+                    "Goal received: ${fitnessData.dailyGoal}",
+
+                )
+            },
+            onError = { exception ->
+                Log.d(
+                    "SharedFirebased",
+                    "Cloud not update goal",
+                    exception,
+                ) // end of log.d
+            },
+        )
         createNotificationChannel(this)
         heartRateSensorManager = HeartRateSensorManager(context = this, onHeartRateChanged = {
             newHeartRate -> heartRate = newHeartRate
