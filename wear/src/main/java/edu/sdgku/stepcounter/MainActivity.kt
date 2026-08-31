@@ -27,6 +27,7 @@ import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import com.google.android.gms.wearable.Wearable
+import com.google.firebase.firestore.ListenerRegistration
 import edu.sdgku.stepcounter.Theme.StepCounterTheme
 import edu.sdgku.stepcounter.shared.data.FirebaseRepository
 
@@ -37,14 +38,18 @@ class MainActivity : ComponentActivity() {
     private var stepsGoal by mutableIntStateOf(10000)
     private lateinit var heartRateSensorManager: HeartRateSensorManager
     private lateinit var wearDataListener: WearDataListener
-    private val heartRatePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
-        isGranted -> if(isGranted){
+    private lateinit var repository: FirebaseRepository
+    private var firebaseListener: ListenerRegistration? = null
+    private val heartRatePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
                 heartRateSensorManager.startListening()
             }
         }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val repository = FirebaseRepository()
+//        val repository = FirebaseRepository()
+        repository = FirebaseRepository()
         repository.listenToFitnessData(
             onDataChange = { fitnessData ->
                 Log.d(
@@ -87,13 +92,48 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume(){ // stop the sensor from getting constant information to save battery
         super.onResume()
-        if (::heartRateSensorManager.isInitialized){ // check if this variable is initialized because of late init
+        // checking if heartRateSensorManager is initialized and start listening
+        if (::heartRateSensorManager.isInitialized) { // check if this variable is initialized because of late init
             heartRateSensorManager.startListening()
-            }
-        if (::wearDataListener.isInitialized){
+        }
+        // checking if wearDataListener is initialized and start listening
+        if (::wearDataListener.isInitialized) {
             Wearable.getDataClient(this).addListener(wearDataListener)
-            }
+        }
+        // checking if repository is initialized and if it is start the listener
+        if (::repository.isInitialized){
+            startFirebaseListener()
+        }
     }
+
+
+    private fun startFirebaseListener(){
+        if (firebaseListener != null){
+            return
+        }
+        firebaseListener = repository.listenToFitnessData(
+            onDataChange = {fitnessData ->
+                runOnUiThread {
+                    stepsGoal = fitnessData.dailyGoal.toInt()
+                }
+            },
+
+            onError = { exception ->
+                Log.e(
+                    "Shared firebase wear",
+                    "Firebase listener error",
+                    exception
+                )
+            },
+        )
+    }
+
+
+    private fun stopFirebaseListener(){
+        firebaseListener?.remove()
+        firebaseListener = null
+    }
+
 
     override fun onPause(){
         super.onPause()

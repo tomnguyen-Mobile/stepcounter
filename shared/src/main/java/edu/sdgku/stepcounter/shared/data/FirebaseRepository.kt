@@ -14,9 +14,8 @@ class FirebaseRepository (
         .document(FirestoreConstants.DEMO_USER_DOCUMENT)
 
     fun listenToFitnessData(
-        onDataChange: (FitnessData) -> Unit,
-        onError: (Exception) -> Unit,
-        ): ListenerRegistration {
+        onDataChanged: (FitnessData) -> Unit,
+        onError: (Exception) -> Unit = {}): ListenerRegistration {
             return fitnessDocument.addSnapshotListener { snapshot, exception ->
                     if (exception != null){
                         onError(exception)
@@ -27,10 +26,10 @@ class FirebaseRepository (
                         }
                     val fitnessData = FitnessData(
                         dailyGoal = snapshot.getLong(FirestoreConstants.FIELD_DAILY_GOAL) ?: 10000,
-                        steps = snapshot.getLong(FirestoreConstants.FIELD_STEP) ?: 0,
+                        steps = snapshot.getLong(FirestoreConstants.FIELD_STEPS) ?: 0,
                         heartRate = snapshot.getLong(FirestoreConstants.FIELD_HEART_RATE) ?: 72
                         )
-                    onDataChange(fitnessData)
+                    onDataChanged(fitnessData)
                 }
         }
 
@@ -41,7 +40,7 @@ class FirebaseRepository (
         ){
             val data = mapOf(
                 FirestoreConstants.FIELD_DAILY_GOAL to fitnessData.dailyGoal,
-                FirestoreConstants.FIELD_STEP to fitnessData.steps,
+                FirestoreConstants.FIELD_STEPS to fitnessData.steps,
                 FirestoreConstants.FIELD_HEART_RATE to fitnessData.heartRate,
                 FirestoreConstants.FIELD_UPDATED_AT to Timestamp.now()
             )
