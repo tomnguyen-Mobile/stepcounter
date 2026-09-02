@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.Firebase
 import edu.sdgku.stepcounter.sendStepsGoalToWatch
 import edu.sdgku.stepcounter.shared.data.FirebaseRepository
+import edu.sdgku.stepcounter.shared.model.FitnessData
 
 @Composable
 fun PhoneCompanionApp(
@@ -21,11 +22,13 @@ fun PhoneCompanionApp(
     val context = LocalContext.current
     var stepsGoal by remember { mutableIntStateOf(100000) }
     var sendStatus by remember { mutableStateOf("Not sent") }
+    var cloudData by remember { mutableStateOf<FitnessData?>(null) }
 
     DisposableEffect( repository){
         val listenerRegistration = repository.listenToFitnessData(
             onDataChanged = {
                 fitnessData ->
+                cloudData = fitnessData
                 stepsGoal = fitnessData.dailyGoal.toInt()
                 sendStatus = "Goal received from Firebase: $stepsGoal"
             },
@@ -68,7 +71,8 @@ fun PhoneCompanionApp(
             onDecrease = onDecrease,
             onIncrease = onIncrease,
             onSendToWatch = onSendToWatch,
-            onSaveToFirebase = onSaveToFirebase        )
+            onSaveToFirebase = onSaveToFirebase,
+            cloudData = cloudData)
     } else {
         CompactDashboard(
             stepsGoal = stepsGoal,

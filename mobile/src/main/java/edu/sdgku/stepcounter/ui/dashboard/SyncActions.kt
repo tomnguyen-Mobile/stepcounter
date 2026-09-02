@@ -1,5 +1,6 @@
 package edu.sdgku.stepcounter.ui.dashboard
 
+import android.R.attr.text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +20,8 @@ fun SyncActions(
     sendStatus: String,
     onSendToWatch: () -> Unit,
     onSaveToFirebase: () -> Unit,
-    modifier: Modifier = Modifier
-    ){
+    modifier: Modifier = Modifier,
+    showsStatus: Boolean = true    ){
     Column(
         modifier= modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -28,8 +29,7 @@ fun SyncActions(
 
         Button(
             onClick = onSendToWatch,
-            modifier = Modifier.fillMaxWidth()
-            ){
+            modifier = Modifier.fillMaxWidth()            ){
             Text("Send to Watch")
         }
 
@@ -37,16 +37,15 @@ fun SyncActions(
 
         Button(
             onClick = onSaveToFirebase,
-            modifier = Modifier.fillMaxWidth()
-        ){
+            modifier = Modifier.fillMaxWidth()        ){
             Text("Send to Firebase")
         }
 
-        Spacer (modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Status: $sendStatus",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        if (showsStatus){
+            Spacer (modifier = Modifier.height(16.dp))
+            Text(
+                text = "Status: $sendStatus",
+                style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }

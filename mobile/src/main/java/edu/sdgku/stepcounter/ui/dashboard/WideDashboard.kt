@@ -1,33 +1,34 @@
 package edu.sdgku.stepcounter.ui.dashboard
 
 
-import androidx.compose.foundation.layout.Arrangement
+import android.R.attr.layoutLabel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import edu.sdgku.stepcounter.shared.model.FitnessData
 
 @Composable
 fun WideDashboard(
     stepsGoal: Int,
     sendStatus: String,
     layoutLabel: String,
+    cloudData: FitnessData?,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
     onSendToWatch: () -> Unit,
     onSaveToFirebase: () -> Unit,
-) {
+    extraEditorContent: @Composable () -> Unit = {} ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 40.dp, vertical = 32.dp)
+            .padding(24.dp)
         ) {
             Text(
                 text = "Layout: $layoutLabel",
@@ -37,23 +38,24 @@ fun WideDashboard(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    .padding(top = 12.dp),
                 ) {
-                GoalStepper(
+                GoalEditorPane(
                     stepsGoal = stepsGoal,
+                    sendStatus = sendStatus,
+                    showStatusHere = false,
                     onDecrease = onDecrease,
                     onIncrease = onIncrease,
-                    largeNumber = true,
-                    modifier = Modifier.weight(1f)
-                    )
-
-                SyncActions(
-                    sendStatus = sendStatus,
                     onSendToWatch = onSendToWatch,
                     onSaveToFirebase = onSaveToFirebase,
-                    modifier = Modifier.weight(1f).fillMaxWidth()
+                    modifier = Modifier.weight(.55f),
+                    extraContent = extraEditorContent
+                    )
+                VerticalDivider()
+                DashboardInfoPane(
+                    sendStatus = sendStatus,
+                    cloudData = cloudData,
+                    modifier = Modifier.weight(0.45f)
                     )
 
             }
