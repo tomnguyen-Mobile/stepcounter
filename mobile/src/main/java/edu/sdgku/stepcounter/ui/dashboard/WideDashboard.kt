@@ -24,7 +24,8 @@ fun WideDashboard(
     onIncrease: () -> Unit,
     onSendToWatch: () -> Unit,
     onSaveToFirebase: () -> Unit,
-    extraEditorContent: @Composable () -> Unit = {} ) {
+    extraEditorContent: @Composable () -> Unit = {},
+    onGoalDropped: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +50,8 @@ fun WideDashboard(
                     onSendToWatch = onSendToWatch,
                     onSaveToFirebase = onSaveToFirebase,
                     modifier = Modifier.weight(.55f),
-                    extraContent = extraEditorContent
+                    extraContent = extraEditorContent,
+                    onGoalDropped = onGoalDropped
                     )
                 VerticalDivider()
                 DashboardInfoPane(

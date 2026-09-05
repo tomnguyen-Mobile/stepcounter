@@ -1,5 +1,6 @@
 package edu.sdgku.stepcounter.ui.dashboard
 
+import android.R.attr.onClick
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ fun GoalStepper(
     onIncrease: () -> Unit,
     modifier: Modifier = Modifier,
     largeNumber: Boolean = false,
+    onGoalDropped: ((Int) -> Unit)? = null,
     ){
     Column(
         modifier = modifier,
@@ -44,13 +46,21 @@ fun GoalStepper(
             Button(onClick = onDecrease) { Text("-") }
             Spacer( modifier = Modifier.height(16.dp))
 
-
-            Text(
-                text = stepsGoal.toString(),
-                style = if (largeNumber){
-                    MaterialTheme.typography.displaySmall
-                } else { MaterialTheme.typography.headlineSmall }
-                )
+            val numberText = @Composable{
+                Text(
+                    text = stepsGoal.toString(),
+                    style = if (largeNumber){
+                        MaterialTheme.typography.displaySmall
+                    } else { MaterialTheme.typography.headlineSmall }
+                    )
+            }
+            if (onGoalDropped != null) {
+                GoalDropTarget(onGoalDropped = onGoalDropped){
+                    numberText()
+                }
+            } else {
+                numberText()
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onIncrease) {Text("+")}
         }

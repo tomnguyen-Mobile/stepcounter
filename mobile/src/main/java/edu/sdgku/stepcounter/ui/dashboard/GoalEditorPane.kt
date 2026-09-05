@@ -21,7 +21,8 @@ fun GoalEditorPane(
     onSendToWatch: () -> Unit,
     onSaveToFirebase: () -> Unit,
     modifier: Modifier = Modifier,
-    extraContent: @Composable () -> Unit = {}
+    extraContent: @Composable () -> Unit = {},
+    onGoalDropped :((Int) -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -34,7 +35,8 @@ fun GoalEditorPane(
             stepsGoal = stepsGoal,
             onDecrease = onDecrease,
             onIncrease = onIncrease,
-            largeNumber = !showStatusHere
+            largeNumber = !showStatusHere,
+            onGoalDropped = onGoalDropped
         )
 
         extraContent()

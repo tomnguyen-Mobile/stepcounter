@@ -39,6 +39,7 @@ fun CompactDashboard(
             onIncrease = onIncrease,
             onSendToWatch = onSendToWatch,
             onSaveToFirebase = onSaveToFirebase,
+
         )
     }
 }

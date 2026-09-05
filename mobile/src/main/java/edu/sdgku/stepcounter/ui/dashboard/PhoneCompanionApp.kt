@@ -45,6 +45,8 @@ fun PhoneCompanionApp(
             stepsGoal -= 500
         }
     val onIncrease =  { stepsGoal += 500}
+    val onGoalDropped: (Int) -> Unit = {dropped -> stepsGoal = dropped.coerceAtLeast(500)
+    sendStatus = " Dropped preset $dropped (not saved yet)"}
     val onSendToWatch = {
         sendStatus = "Sending..."
         sendStepsGoalToWatch(
@@ -68,11 +70,13 @@ fun PhoneCompanionApp(
             stepsGoal = stepsGoal,
             sendStatus = sendStatus,
             layoutLabel = layoutLabel,
+            cloudData = cloudData,
             onDecrease = onDecrease,
             onIncrease = onIncrease,
             onSendToWatch = onSendToWatch,
             onSaveToFirebase = onSaveToFirebase,
-            cloudData = cloudData)
+            extraEditorContent = {GoalPresetRow()},
+            onGoalDropped = onGoalDropped )
     } else {
         CompactDashboard(
             stepsGoal = stepsGoal,
